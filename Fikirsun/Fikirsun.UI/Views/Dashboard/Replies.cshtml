@@ -1,0 +1,137 @@
+﻿@model List<Reply>
+@{
+    Layout = "_DashboardLayout";
+}
+
+<div class="row">
+    <div class="col-12 mt-5">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="header-title">Yanıtlar</h4>
+                <div class="data-tables datatable-primary">
+                    <table id="tabledataReplies" class="text-center">
+                        <thead class="text-capitalize">
+                            <tr>
+                                <th>Sahibi</th>
+                                <th>İçerik</th>
+
+                                <th>Tarih</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Count > 0)
+                            {
+                                @foreach (var reply in Model)
+                                {
+                                    <tr>
+                                        <td>@reply.user?.UserName</td>
+                                        <td>@(reply.Content.Length <= 60 ? reply.Content : reply.Content.Substring(0, 60)) ..</td>
+
+                                        <td>@reply.createdDate</td>
+                                        <td>
+                                            <a class="mx-2" onclick="DeleteReply(@reply.Id,this)" href="javascript:void(0)">
+                                                <i style="color:red" class="ti-trash"></i>
+                                            </a>
+                                            @*<a title="Sayfada gör" class="mx-2" target="_blank" href="/Post/Index/@post.Id" href="javascript:void(0)">
+                                                <i class="ti-eye"> Gör </i>
+                                            </a>*@
+                                        </td>
+
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <span style="display:none" class="infoAlert">Henüz bir yanıt yok</span>
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section links{
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.18/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.jqueryui.min.css">
+    <style>
+        /*data tables*/
+        .data-tables .dataTable {
+            width: inherit;
+            border-radius: .5rem;
+        }
+
+        table th {
+            padding: .85rem;
+        }
+
+        div.dataTables_wrapper div.dataTables_length select {
+            width: 4rem;
+        }
+
+        table td {
+            padding: .9rem;
+        }
+
+        table tr td [class^="ti-"] {
+            font-size: 1.3rem;
+            margin: .2rem;
+        }
+    </style>
+}
+@section scripts{
+
+    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.3/js/responsive.bootstrap.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.18/js/dataTables.bootstrap4.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#tabledataReplies').DataTable({
+                "order": [[2, "desc"]]
+            });
+        });
+
+
+
+        function DeleteReply(id, element) {
+            if (id <= 0) {
+                toastr.warning("Post bulunamadı")
+            }
+            else {
+                var replyId = id
+                fetch('/Comment/DeleteReply', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(replyId)
+                })
+                    .then(
+                        response => response.json()
+                    )
+                    .then(data => {
+                        if (data == true) {
+                            setTimeout(function () {
+                                element.parentElement.parentElement.remove()
+                                toastr.info("Başarıyla Silindi")
+                            }, 50)
+                        }else {
+                          toastr.warning(data)
+                        }                    
+                    })
+                     .catch (error => {
+                        console.error(error);
+                        toastr.error("Beklenmedik bir hata oluştu");
+                     });
+            }
+        }
+    </script>
+}
+

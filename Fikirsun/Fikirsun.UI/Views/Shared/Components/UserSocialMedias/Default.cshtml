@@ -1,0 +1,27 @@
+﻿@model UserSocialMediaModel
+
+<div id="footer-social-links">
+    <div>
+        <ul>
+            
+            
+            @if (!string.IsNullOrEmpty(Model.SocialMedia))
+            {
+                <li><a href="@Model.SocialMedia"><i style="font-size:18px;"  class="fa-solid fa-icons"></i>Sosyal Medya</a></li>
+
+            }
+
+            @if (!string.IsNullOrEmpty(Model.ExtraLink))
+            {
+                <li><a href="@Model.ExtraLink"><i style="font-size:18px;" class="fa-solid fa-globe"></i>Ekstra link</a></li>
+
+            }
+
+            @if (string.IsNullOrEmpty(Model.SocialMedia) && string.IsNullOrEmpty(Model.ExtraLink))
+            {
+                <li><a href="javascript:void(0);"> . . . </a></li>
+            }
+        </ul>
+    </div>
+
+</div>

@@ -1,0 +1,21 @@
+﻿@model CreateSpamModel
+@{
+    Layout = "_DashboardLayout";
+}
+<div class="card mt-5">
+    <div class="card-body">
+        <h4 class="header-title">Spam Kelime Oluştur</h4>
+
+        <form asp-controller="Dashboard" asp-action="CreateSpam" method="post">
+            <div class="mb-4">
+                <label asp-for="@Model.Name">Spam Kelime Adı</label>
+                <input class="form-control" type="text" asp-for="@Model.Name">
+                <span class="text-danger" asp-validation-for="@Model.Name"></span>
+            </div>
+            <div>
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+            </div>
+
+        </form>
+    </div>
+</div>

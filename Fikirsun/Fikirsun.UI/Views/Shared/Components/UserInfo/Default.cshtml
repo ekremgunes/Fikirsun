@@ -1,0 +1,15 @@
+﻿@model UserModel
+
+<div class="user-info">
+    <a href="/Account/UserDetail?userName=@Model.UserName">
+        
+        <img src="/images/@Model.profilePhoto" alt="">
+        
+        </a>
+    <h4>@Model.UserName</h4>
+    <h6>@Model.userSubName</h6>
+    <p>
+        @Model.about
+    </p>
+
+</div>

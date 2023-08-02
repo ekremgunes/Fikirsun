@@ -1,0 +1,157 @@
+﻿@model UserSettingsModel
+
+@section links{
+    <link rel="stylesheet" href="/front/assets/css//userSettings.css">
+
+}
+@section title{
+    Hesap ayarları
+}
+
+
+
+<section id="middle-forum-section" class="col-lg-9 col-12 ">
+    <div class="post-area ">
+        <div class="settings-area">
+            <div>
+                <div class="mb-2 text-center">
+                    <h2>Account Settings</h2>
+                    <hr style="margin-top: 0;">
+                </div>
+                <form asp-action="Settings" asp-controller="Account" method="post" enctype="multipart/form-data">
+                    <input type="hidden" value="@Model.ProfilePhoto" asp-for="@Model.ProfilePhoto"/>
+                    <div class="user-pp-div">
+                        <button type="button" onclick="cancelImageUpload()" class="cancel-button"
+                                aria-label="Cancel image upload">
+                            <i class="fa fa-times"></i>
+                        </button>
+                        <div class="image-upload">
+                            <label for="image-input" class="image-label">
+                             
+                               <img class="preview-image" src="/images/@Model.ProfilePhoto">
+                                
+                            </label>
+
+                            <input name="ProfilePhotoFile" accept='image/*' type="file" value="" id="image-input" class="image-input">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="form-label" for="">Kullanıcı Adı</label>&nbsp;
+                        <span asp-validation-for="@Model.UserName" class="text-danger"></span>
+                        <input asp-for="@Model.UserName" placeholder="Kullanıcı Adı" type="text" class="form-control" value="@Model.UserName">
+
+                    </div>
+                    <div>
+                        <label class="form-label" for="">Kullanıcı Rumuz</label>&nbsp;
+                        <span asp-validation-for="@Model.UserSubName" class="text-danger"></span>
+                        <input asp-for="@Model.UserSubName" placeholder="Kullanıcı rumuz" type="text" class="form-control" value="@Model.UserSubName">
+
+                    </div>
+                    <div>
+                        <label class="form-label" for="">Hakkında</label>&nbsp;
+                        <span asp-validation-for="@Model.About" class="text-danger"></span>
+                        <input asp-for="@Model.About" placeholder="Hakkında metni" type="text" class="form-control" value="@Model.About">
+
+                    </div>
+                    <div>
+                        <label class="form-label" for="">Email</label>&nbsp;
+                        <span asp-validation-for="@Model.Email" class="text-danger"></span>
+                        <input asp-for="@Model.Email" placeholder="placeholder" type="email" class="form-control"
+                               value="@Model.Email">
+
+                    </div>
+
+                    <div>
+                        <label class="form-label" for="">
+                            Sosyal Medya
+                        </label>&nbsp;
+                        <span asp-validation-for="@Model.SocialMedia" class="text-danger"></span>
+                        <input placeholder="sosyal medya linkini gir" asp-for="@Model.SocialMedia" type="text" class="form-control"
+                               value="@Model.SocialMedia">
+
+                    </div>
+                    <div>
+                        <label class="form-label" for="">
+                            Ekstra link
+                        </label>&nbsp;
+                        <span asp-validation-for="@Model.ExtraLink" class="text-danger"></span>
+                        <input placeholder="ekstra link" asp-for="@Model.ExtraLink" type="text" class="form-control"
+                               value="@Model.ExtraLink">
+
+                    </div>
+                    @*<div>
+                        <label class="form-label" asp-for="@Model.NewPassword">
+                            Yeni şifre (opsiyonel)
+                        </label>&nbsp;
+                        <span class="text-danger"></span>
+                        <input placeholder="Yeni şifre" type="password" asp-for="@Model.NewPassword" class="form-control"
+                               value="">
+
+                    </div>*@
+
+                    <div class="col-12">
+                        <button class="btn-submit" type="submit">Güncelle</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+</section>
+<section id="right-forum-section" class="col-12 col-lg-3">
+
+    @await Component.InvokeAsync("UserInfo")
+
+    <div id="footer">
+        @await Component.InvokeAsync("UserSocialMedias",Model.UserName)
+    </div>
+    
+    @await Component.InvokeAsync("Pages")
+</section>
+
+
+
+@section scripts{
+
+
+    <script>
+        const imageUpload = document.querySelector('.image-upload')
+        const previewImage = imageUpload.querySelector('.preview-image')
+        const imageInput = imageUpload.querySelector('.image-input')
+        var imgSrc = previewImage.getAttribute("src")
+
+        function showPreviewImage() {
+            const file = imageInput.files[0]
+            var extn = file.name.substring(file.name.lastIndexOf('.') + 1).toLowerCase()
+            if (extn != "png" && extn != "jpg" && extn != "jpeg" && extn != "svg") {
+                toastr.info("Desteklenmeyen dosya türü")
+                return
+            }
+            const reader = new FileReader()
+            reader.onload = function (event) {
+                previewImage.src = event.target.result
+                // imageInput.value = event.target.result <-<<<<<need test
+                imageUpload.classList.add('has-image')
+            }
+
+            reader.readAsDataURL(file)
+        }
+
+        function cancelImageUpload() {
+            previewImage.src = imgSrc
+            imageUpload.classList.remove('has-image')
+        }
+
+        previewImage.addEventListener('click', function () {
+            imageInput.click()
+        });
+
+        imageInput.addEventListener('change', showPreviewImage)
+
+
+
+
+    </script>
+}

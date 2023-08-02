@@ -1,0 +1,974 @@
+﻿@model Post
+@{
+    var ActiveUser = ViewBag.ActiveUser;
+    string userName = ActiveUser.UserName;
+    string userProfilePhoto = ActiveUser.profilePhoto;
+
+}
+@section links{
+    <meta name="description" content="@Model.postTitle">
+    <link href="~/front/assets/css/single.css" rel="stylesheet" />
+    <style>
+        #overlayComment,
+        #overlayPost {
+            z-index: 4;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 2rem;
+            background-color: rgba(19, 19, 19, 0.466);
+            display: none;
+        }
+        .replies{
+            display:none;
+        }
+        .replies-open{
+            display:block;
+        }
+    </style>
+}
+@section title{
+     Fikirsun | @Model.postTitle
+}
+<section id="middle-forum-section" class="col-lg-9 col-12 ">
+    <div class="post-area ">
+        <div class="post">
+            <div>
+                <div class="post-info">
+                    <a class="userName" href="/Account/UserDetail?userName=@Model.user!.UserName">
+
+                        <img src="/images/@Model.user!.profilePhoto" class="post-sender-img">
+
+                        @Model.user.UserName
+
+                    </a>
+                    <small class="post-date">
+                        @(TimeHelper.Invoke(Model.createdDate))
+                        &nbsp;&nbsp;
+                        @(Model.isEdited ? "*Düzenlendi*" : "")
+                    </small>
+
+                    @if (User.Identity?.Name == Model.user.UserName)
+                    {
+                        <div style="display:inline;margin-left: 2rem;">
+                            <a style="cursor:pointer" onclick="DeletePost(this)" href="javascript:void(0)" lass="mx-1">
+                                <i style="color:#c12b32;" class="fa-solid fa-trash-can"></i>
+                            </a>
+                            <a style="cursor:pointer" href="/Post/UpdatePost/@Model.Id" class="mx-2">
+                                <i style="color:var(--light_blue);" class="fa-solid fa-pen-to-square"></i>
+                            </a>
+                        </div>
+                    }
+
+                </div>
+
+                <div class="post-content">
+                    <h1 class="post-head">@Model.postTitle</h1>
+                    <p class="post-inner">
+                        @Html.Raw(Model.postContent)
+                    </p>
+                    <div class="post-footer">
+                        <div>
+                            @if (Model.tags != null)
+                            {
+                                @foreach (var tag in Model.tags)
+                                {
+                                    <a href="javascript:void(0);" class="tag">#@tag.Name</a>
+                                }
+                            }
+                            <a href="/Home/Index/@Model.categoryId" class="tag">@Model.category.Name</a>
+
+                            <i class="fa-regular fa-comments icon-comment"> </i><span>@Model.comments.Count</span>
+
+                            <i class="fa-solid fa-heart icon-heart
+                            @(ViewBag.likedBefore ? "red-color" : "") ">
+                            </i>
+
+                            <span>@Model.likeCount</span>
+
+
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" value="@Model.Id" id="postId"> <!-- your post id-->
+                <input type="hidden" value="@Model.likeCount" id="postLikeCount"> <!-- your post like count-->
+
+            </div>
+        </div>
+
+        <!-- add comment  , if user Authorized-->
+        <div class="comment ">
+            <textarea placeholder="Yorumunuz . . ." class="comment-textarea" name="comment"></textarea>
+            <div class="comment-card-footer">
+                <button type="button" onclick="SendComment(this)">
+                    <i class="fa-solid fa-reply icon-reply"></i>Yorum Yap
+                </button>
+            </div>
+
+        </div>
+        <!-- add comment end -->
+        <div class="toggle-comments">
+            <button onclick="toggleComments()">
+                <i class="fa-solid fa-ellipsis"></i>
+                Yorumlar
+            </button>
+        </div>
+        <!-- comments -->
+
+        <div class="comments-area comments-open">
+            <div class="user-comments"></div>
+            @if (Model.comments.Count > 0)
+            {
+                bool isAnswered = false;
+
+                foreach (var comment in Model.comments)
+                {
+
+                    if (ViewBag.answer != null) //cevaplanmış bir yoruma sahibiz
+                    {
+                        if (ViewBag.answer.Id == comment.Id)
+                        {
+                            isAnswered = true;
+                        }
+                    }
+
+                    <div id="comment@(comment.Id)" class="@(isAnswered ? "answered" : "") comment">
+                        <div>
+                            <div class="comment-info">
+                                <a class="userName" href="/Account/UserDetail?userName=@comment.user?.UserName">
+                                    <img width="5rem" src="/images/@comment.user?.profilePhoto" class="comment-sender-img">
+                                   
+                                    @comment.user?.UserName
+                                </a>
+                                <small class="comment-date">@(TimeHelper.Invoke(comment.createdDate))</small>
+                                <div style="margin-left:1rem;" onclick="toggleReplies(this)" class="reply-div">
+                                    <i class="fa-solid fa-bars">                                        
+                                    </i>
+
+                                    <small>@(comment.replies.Count > 0 ? comment.replies.Count : "") </small>
+
+                                </div>
+                            </div>
+
+                            <div class="comment-content">
+                                <p class="comment-inner">
+                                    @comment.Content
+                                </p>
+                                <div class="comment-footer">
+                                    <div>
+                                        @{
+                                            bool isLiked = false;
+
+                                            if (ViewBag.likedComments.Count > 0)
+                                            {
+                                                for (int i = 0; i < ViewBag.likedComments.Count; i++)
+                                                {
+                                                    if (ViewBag.likedComments[i].commentId == comment.Id)
+                                                    {
+                                                        isLiked = true;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        <i class="fa-solid fa-heart icon-heart @(isLiked ? "red-color" : "")"></i>
+                                        <span>@comment.likeCount</span>
+
+
+
+                                        <div onclick="createreplyDiv(this)" class="reply-div">
+                                            <i class="fa-solid fa-reply icon-reply"></i> <span>yanıtla</span>
+
+                                        </div>
+                                        @if (comment.userId == ActiveUser.Id)
+                                        {
+                                            <div onclick="deleteComment(this)" class="reply-div trash-div">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </div>
+                                        }
+                                        @if (Model.userId == ActiveUser.Id)
+                                        {
+                                            <div onclick="AnswerComment(@comment.Id,this)" class="reply-div mx-3">
+                                                <i style="color:#35db3596;" class="fa-regular fa-circle-check"></i>
+                                            </div>
+                                        }
+                                        else if (isAnswered)
+                                        {
+                                            <div onclick='toastr.success("Bu yorum @Model.user.UserName tarafından onaylanmıştır")' class="reply-div mx-3">
+                                                <i style="color:#35db3596;" class="fa-regular fa-circle-check"></i>
+                                            </div>
+                                        }
+
+                                    </div>
+                                </div>
+                                <!-- comment replies -->
+                                <div class="replies">
+                                    @if (comment.replies.Count > 0)
+                                    {
+                                        foreach (var reply in comment.replies)
+                                        {
+                                            <div id="reply@(reply.Id)" class="comment">
+                                                <div>
+                                                    <div class="comment-info">
+                                                        <a class="userName" href="/Account/UserDetail?userName=@reply.user.UserName">
+                                                            <img style="width:5rem !important;" src="/images/@reply.user.profilePhoto" class="comment-sender-img">
+                                                            @reply.user.UserName
+                                                        </a><small class="comment-date">@(TimeHelper.Invoke(reply.createdDate))</small>
+
+                                                        @if (reply.userId == ActiveUser.Id)
+                                                        {
+                                                            <div onclick="deleteReply(this,@reply.Id)" class="reply-div trash-div trash-reply">
+                                                                <i class="fa-solid fa-trash"></i>
+                                                            </div>
+                                                        }
+                                                        <div style="margin-left: 1.1rem;" onclick="createreplyUserDiv(this,@reply.userId)" class="reply-div ">
+                                                            <i class="fa-solid fa-reply icon-reply"></i>
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="comment-content">
+                                                        <p class="comment-inner">
+                                                            @reply.Content
+                                                        </p>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                        }
+                                    }
+                                </div>
+                            </div>
+                            <input type="hidden" value="@comment.Id" id="commentId"> <!-- your comment id-->
+                        </div>
+                    </div>
+                    isAnswered = false;
+                }
+
+            }
+
+        </div>
+    </div>
+
+
+</section>
+<section id="right-forum-section" class="col-12 col-lg-3">
+
+    <div class="user-info">
+        <a class="userName" href="/Account/UserDetail?userName=@Model.user.UserName">
+            <img src="/images/@Model.user!.profilePhoto" class="post-sender-img" />
+        </a>
+        <h4>@Model.user.UserName</h4>
+        <h6>@Model.user.userSubName</h6>
+        <p>
+            @Model.user.about
+        </p>
+    </div>
+
+    <div id="footer">
+        @await Component.InvokeAsync("UserSocialMedias",Model.user?.UserName)
+        
+    </div>
+    @await Component.InvokeAsync("Pages")
+
+</section>
+
+<!-- modal divs  -->
+<div onclick="ModalDeleteComment('no')" id="overlayComment"></div>
+<div onclick="ModalDeletePost('no')" id="overlayPost"></div>
+
+@section scripts{
+    <script>
+
+        toastr.options.closeButton = true
+        const overlayComment = document.getElementById("overlayComment")
+        const overlayPost = document.getElementById("overlayPost")
+        const htmlbody = document.body
+        // post -delete
+        const ModalDeletePost = (action = "yes") => {
+            modelDelete = document.querySelector("#modal-delete-post")
+            if (action == "yes") {
+                var postId = document.querySelector(".post #postId").value
+                if (postId < 1) {
+                    toastr.warning("Soru id bulunamadı")
+                    return
+                }
+                fetch('/Post/DeletePost', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(postId)
+                })
+                    .then(
+                        response => response.json()
+                    )
+                    .then(data => {
+                        if (data == true) {
+                            toastr.info("Sorunuz başarıyla Silindi . Ana sayfaya yönlendiriliyorsunuz")
+
+                            setTimeout(function () {
+                                window.location.href = "/Home/Index"
+                            }, 1700)
+
+                        } else if (data.includes("/Post/Index")) {
+                            window.location.href = data
+                        }
+                        else if (data == "404") {
+                            toastr.warning("Sorunuz bulunamadı . Ana sayfaya yönlendiriliyorsunuz")
+
+                            setTimeout(function () {
+                                window.location.href = "/Home/Index"
+                            }, 1700)
+                        }
+                        else {
+                            toastr.error(data)
+
+                        }
+
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        toastr.error("Beklenmedik bir hata oluştu");
+                    });
+
+            }
+            if (overlayPost != null) {
+                overlayPost.style.display = "none"
+            }
+            if (modelDelete != null) {
+                $("#modal-delete-post").remove()
+            }
+        }
+
+        function DeletePost(e) {
+            var post = e.parentElement.parentElement.parentElement.parentElement
+            post.innerHTML += `<div id="modal-delete-post">
+                                                                                                                  <p>Silmeyi onaylıyor musunuz?</p>
+                                                                                                                               <div class="modal-delete-footer">
+                                                                                                                                           <button onclick="ModalDeletePost('no')" class="no-btn"><i class="fa-solid fa-xmark"></i></button>
+                                                                                                                                          <button onclick="ModalDeletePost('yes')" class="yes-btn"><i
+                                                                                                                                     class="fa-solid fa-check fa-bounce"></i></button>
+
+                                                                                                                  </div>
+                                                                                                         </div> `
+            overlayPost.style.display = "block"
+        }
+        // comment -delete
+        const ModalDeleteComment = (action = "yes", element = null) => {
+            modelDelete = document.querySelector("#modal-delete")
+
+            if (action == "yes" && element != null) {
+                var commentElement = element.parentElement.parentElement.parentElement
+                var commentId = commentElement.querySelector("#commentId").value
+                if (commentId < 1) {
+                    toastr.warning("Yorum id bulunamadı")
+                    return
+                }
+                fetch('/Comment/DeleteComment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(commentId)
+                })
+                    .then(
+                        response => response.json()
+                    )
+                    .then(data => {
+                        if (data == true) {
+                            commentElement.remove()
+                        } else {
+                            console.error(error);
+                            toastr.warning("Beklenmedik bir hata oluştu");
+                        }
+
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        toastr.error("Beklenmedik bir hata oluştu");
+                    });
+
+            }
+            if (overlayComment != null) {
+                overlayComment.style.display = "none"
+            }
+            if (modelDelete != null) {
+                $("#modal-delete").remove()
+            }
+        }
+
+        const deleteComment = (e) => {
+            var comment = e.parentElement.parentElement.parentElement.parentElement.parentElement
+            comment.innerHTML += `<div id="modal-delete">
+                                                                                                                                    <p>Silmeyi onaylıyor musunuz?</p>
+                                                                                                                                    <div class="modal-delete-footer">
+                                                                                                                                        <button onclick="ModalDeleteComment('no')" class="no-btn"><i class="fa-solid fa-xmark"></i></button>
+                                                                                                                                        <button onclick="ModalDeleteComment('yes',this)" class="yes-btn"><i
+                                                                                                                                                class="fa-solid fa-check fa-bounce"></i></button>
+
+                                                                                                                                        </div>
+                                                                                                                                    </div> `
+            overlayComment.style.display = "block"
+
+        }
+
+
+        //comment actions
+        const userComments = document.querySelector(".comments-area .user-comments")
+
+        function SendComment(element) {
+            var commentText = element.parentElement.parentElement.querySelector("textarea").value.trim()
+            var darkMode = localStorage.getItem('selectedTheme') == 'dark' ? 'item-dark' : ''
+            if (commentText.length < 1) {
+                toastr.warning("Yorum alanı boş bırakılamaz")
+            } else {
+                if (!isAuth()) {
+                    toastr.info("Bu işlemi gerçekleştirmek için giriş yapmalısınız")
+                    return
+                }
+                var postId = document.querySelector(".post #postId").value
+                var comment = {
+                    postId: postId,
+                    Content: commentText
+                }
+                fetch('/Comment/CreateComment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(comment)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data == null || data == false) {
+                            toastr.warning("hata")
+                            return
+                        } else if (data > 0) {
+                            const activeUserId = @ActiveUser.Id
+                                    const postOwnerId = @Model.userId
+                                    var answerDiv = ``
+                            if (activeUserId == postOwnerId) {
+                                answerDiv =
+                                    `<div onclick='AnswerComment(${data},this)' class='reply-div mx-3' ><i style='color:#35db3596;' class='fa-regular fa-circle-check'></i></div>`;
+                            }
+                            element.parentElement.parentElement.querySelector("textarea").value = "" //clear comment area
+                            userComments.innerHTML += `<div class="comment ${darkMode} ">
+                                                <div>
+                                                                <div class="comment-info">
+                                                                        <a class="userName ${darkMode == "item-dark" ? "item-dark-text" : ""}" href="/Account/UserDetail?userName=@userName">
+                                                                        <img src="/images/@userProfilePhoto" class="comment-sender-img">
+        @userName </a><small class="comment-date">1 saniye önce</small>
+                                                                    </div>
+
+                                                                    <div class="comment-content">
+                                                                    <p class="comment-inner">
+                                                                            ${commentText}
+                                                                        </p>
+                                                                <div class="comment-footer">
+                                                                    <div>
+                                                                        <i class="fa-solid fa-heart icon-heart"></i><span>0</span>
+                                                                        <div onclick="createreplyDiv(this)" class="reply-div">
+                                                                            <i class="fa-solid fa-reply icon-reply"></i> <span>yanıtla</span>
+                                                                        </div>
+                                                                        <div onclick="deleteComment(this)" class="reply-div trash-div">
+                                                                            <i class="fa-solid fa-trash"></i>
+                                                                        </div>
+                                                                                ${answerDiv}
+                                                                                </div>
+                                                                    </div>
+                                                                    <!-- comment replies -->
+                                                                    <div class="replies"></div>
+                                                                </div>
+                                                                    <input type="hidden" value="${data}" id="commentId">
+                                                                </div>
+                                                        </div>`;
+                            window.scrollBy(0, 210);
+                        }
+                        else {
+                            toastr.warning(data)
+                        }
+
+
+
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        toastr.error("Beklenmedik bir hata oluştu");
+                    });
+            }
+        }
+
+        function AnswerComment(commentId, commentElement) {
+            if (commentId == null || commentId < 1) {
+                toastr.warning("Bu yorumu cevaplandı olarak işaretlerken bir sorun oluştu")
+                return;
+            } else {
+                var postId = document.querySelector(".post #postId").value
+                var comment = {
+                    postId: postId,
+                    commentId: commentId
+                }
+                fetch('/Comment/AnswerComment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(comment)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        var answeredComment = commentElement.parentElement.parentElement.parentElement.parentElement.parentElement
+
+                        if (data == "answered") {
+                            var commentsArea = document.querySelector(".comments-area")
+                            if (commentsArea.querySelector(".answered")) {
+                                commentsArea.querySelector(".answered").classList.remove("answered")
+                            }
+                            answeredComment.classList.add("answered")
+
+                        } else if (data == "unanswered") {
+                            var commentsArea = document.querySelector(".comments-area")
+                            if (commentsArea.querySelector(".answered")) {
+                                commentsArea.querySelector(".answered").classList.remove("answered")
+                            }
+                        }
+                        else {
+                            toastr.warning(data)
+                            return
+                        }
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        toastr.error("Beklenmedik bir hata oluştu");
+                    });
+            }
+        }
+        //reply actions
+        //reply to reply
+        const createreplyUserDiv = (element, userId) => {
+            if (!isAuth()) {
+                toastr.info("Bu işlemi gerçekleştirmek için giriş yapmalısınız")
+                return
+            }
+            if (userId < 1) {
+                toastr.warning("Yanıtladığınız yanıtın sahibine ulaşamadık")
+                return
+            }
+
+            var darkMode = localStorage.getItem('selectedTheme') == 'dark' ? 'item-dark' : ''
+
+            var parentCommentId = element.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement
+                .querySelector("#commentId").value
+            if (parentCommentId < 1) {
+                toastr.warning("Yanıt atarken bir sorun oluştu (yorum bulunamadı)")
+                return
+            }
+
+            var reply_div = `<div class="comment ${darkMode == "item-dark" ? "dark" : ""} reply-active">
+                                                                                                                        <input type="hidden" value="${parentCommentId}" id="replied-comment-input">
+                                                                                                                        <input type="hidden" value="${userId}" id="replied-user-input">
+                                                                                                                               <div>
+                                                                                                                                  <div class="comment-info">
+                                                                                                                                       <a class="userName ${darkMode == "item-dark" ? "item-dark-text" : ""}" href="/Account/UserDetail?userName=@userName">
+                                                                                                                                          <img class="comment-sender-img" style="width:5rem !important;" src="/images/@userProfilePhoto">
+        @userName
+                                                                                                                                       </a>
+                                                                                                                                </div>
+                                                                                                                                <div class="comment-content reply-content">
+                                                                                                                                  <textarea name="replyInput" class="reply-input" cols="70"  rows="2">
+                                                                                                                                   </textarea>
+                                                                                                                                <div class="reply-footer">
+                                                                                                                                    <button onclick="replyCancel(this)" class="reply-cancel-btn">
+                                                                                                                                       <i class="fa-solid fa-ban"></i>iptal</button>
+                                                                                                                                    <button onclick="reply(this)" class="reply-btn"><i class="fa-solid fa-reply icon-reply"></i>gönder</button>
+                                                                                                                                </div>
+                                                                                                                              </div>
+                                                                                                                             </div>
+                                                                                                                     </div> `;
+
+            if (document.querySelectorAll(".replies .reply-active").length == 0) {
+                var repliesDiv = element.parentNode.parentNode.parentNode.parentNode.parentNode;
+                repliesDiv.childNodes[7].innerHTML += reply_div
+                repliesDiv.querySelector(".reply-input").focus()
+            }
+            else if (document.querySelectorAll(".replies .reply-active").length == 1) {
+                replyCancel()
+                createreplyDiv(element)
+            }
+        }
+
+        //reply
+        const createreplyDiv = (element) => {
+            if (!isAuth()) {
+                toastr.info("Bu işlemi gerçekleştirmek için giriş yapmalısınız")
+                return
+            }
+            toggleReplies(element.parentElement,true)
+            var darkMode = localStorage.getItem('selectedTheme') == 'dark' ? 'item-dark' : ''
+            var parentCommentId = element.parentElement.parentElement.parentElement.parentElement.parentElement.querySelector("#commentId").value;
+
+            var reply_div = `<div class="comment ${darkMode == "item-dark" ? "dark" : ""} reply-active">
+                                                                                                                <input type="hidden" value="${parentCommentId}" id="replied-comment-input">
+                                                                                                                       <div>
+                                                                                                                          <div class="comment-info">
+                                                                                                                               <a class="userName ${darkMode == "item-dark" ? "item-dark-text" : ""}" href="/Account/UserDetail?userName=@userName">
+                                                                                                                                  <img class="comment-sender-img" style="width:5rem !important;" src="/images/@userProfilePhoto">
+        @userName
+                                                                                                                               </a>
+                                                                                                                        </div>
+                                                                                                                        <div class="comment-content reply-content">
+                                                                                                                          <textarea name="replyInput" class="reply-input" cols="70"  rows="2">
+                                                                                                                           </textarea>
+                                                                                                                        <div class="reply-footer">
+                                                                                                                            <button onclick="replyCancel(this)" class="reply-cancel-btn">
+                                                                                                                               <i class="fa-solid fa-ban"></i>iptal</button>
+                                                                                                                            <button onclick="reply(this)" class="reply-btn"><i class="fa-solid fa-reply icon-reply"></i>gönder</button>
+                                                                                                                        </div>
+                                                                                                                      </div>
+                                                                                                                     </div>
+                                                                                                             </div> `;
+
+            if (document.querySelectorAll(".replies .reply-active").length == 0) {
+                var repliesDiv = element.parentNode.parentNode.parentNode;
+                repliesDiv.childNodes[7].innerHTML += reply_div
+                repliesDiv.querySelector(".reply-input").focus()
+            }
+            else if (document.querySelectorAll(".replies .reply-active").length == 1) {
+                replyCancel()
+                createreplyDiv(element)
+            }
+
+        }
+
+        const replyCancel = () => {
+            document.querySelector(".reply-active").remove()
+        }
+
+        const deleteReply = (e, replyId) => {
+            if (replyId < 1) {
+                toastr.warning("Yanıt bulunamadı")
+                return
+            }
+            fetch('/Comment/DeleteReply', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(replyId)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data == null || data == false) {
+                        toastr.warning("Yanıt silinirken bir hata oluştu")
+                        return
+                    }
+                    e.parentElement.parentElement.parentElement.remove()
+
+
+                })
+                .catch(error => {
+                    console.error(error);
+                    toastr.error("Yanıt silinirken beklenmedik bir hata oluştu");
+                });
+        }
+
+        const reply = (element) => {
+            var replyMessage = ""
+            replyMessage = document.querySelector(".replies .reply-active .reply-input").value.trim()
+            
+            if (replyMessage.length < 1) {
+                toastr.warning("Yanıt alanı boş bırakılamaz")
+                return
+            } else {
+                var repliedCommentId = document.querySelector(".replies .reply-active #replied-comment-input").value
+                var repliedUserId = document.querySelector(".replies .reply-active #replied-user-input")?.value
+                if (repliedCommentId < 1) {
+                    console.warning("Replied comment id can't found")
+                    return
+                }
+                if (!isAuth()) {
+                    toastr.info("Bu işlemi gerçekleştirmek için giriş yapmalısınız")
+                    return
+                }
+
+                var replyModel = {
+                    commentId: repliedCommentId,
+                    Content: replyMessage
+                }
+                if(repliedUserId != null && repliedUserId != ""){
+                    replyModel.replyUserId = repliedUserId
+                }
+                fetch('/Comment/CreateReply', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(replyModel)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data == null || data == false)
+                            return
+
+                        var repliesDiv = element.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
+                        var darkMode = localStorage.getItem('selectedTheme') == 'dark' ? 'item-dark' : ''
+                        var reply_div = `<div class="comment ${darkMode}">
+                                                                                                                                                                <div>
+                                                                                                                                                                    <div class="comment-info">
+                                                                                                                                                                                <a class="userName ${darkMode == "item-dark" ? "item-dark-text" : ""}" href="/Account/UserDetail?userName=@userName">
+                                                                                                                                                                                    <img style="width:5rem !important" src="/images/@userProfilePhoto" class="comment-sender-img">
+        @userName
+                                                                                                                                                                        </a><small class="comment-date">1 saniye önce</small>
+                                                                                                                                                                        <div onclick="deleteReply(this,${data})" class="reply-div trash-div trash-reply">
+                                                                                                                                                                        <i class="fa-solid fa-trash"></i>
+                                                                                                                                                                        </div>
+                                                                                                                                                                                <div style="margin-left: 1.1rem;" onclick="createreplyUserDiv(this,@ActiveUser.Id)" class="reply-div ">
+                                                                    <i class="fa-solid fa-reply icon-reply ml-1"></i>
+                                                                </div>
+                                                                                                                                                                    </div>
+                                                                                                                                                                    <div class="comment-content">
+                                                                                                                                                                        <p class="comment-inner">
+                                                                                                                                                                            ${replyMessage}
+                                                                                                                                                                        <p>
+
+                                                                                                                                                                    </div>
+                                                                                                                                                                </div>
+                                                                                                                                                            </div>`;
+                        replyCancel()
+                        repliesDiv.childNodes[7].innerHTML += reply_div
+
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        toastr.error(error);
+                    });
+
+
+            }
+        }
+
+        //like actions
+        const commentLikes = document.querySelectorAll(".comments-area .icon-heart")
+
+        commentLikes.forEach(e => {
+            e.addEventListener('click', () => {
+                if (!isAuth()) {
+                    toastr.info("Bu işlemi gerçekleştirmek için giriş yapmalısınız")
+                    return
+                }
+                const commentId = e.parentElement.parentElement.parentElement.parentElement.querySelector("#commentId").value
+                if (commentId < 1) {
+                    toastr.warning("Comment id can't found")
+                    return
+                }
+
+                if (e.classList.contains("red-color")) {
+                    fetch('/Comment/DislikeComment', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: commentId
+                    })
+                        .then(
+                            response => response.json()
+                        )
+                        .then(data => {
+                            if (data == true) {
+                                var commentCount = parseInt(e.parentElement.querySelector("span").textContent)
+                                e.parentElement.querySelector("span").textContent = `${--commentCount}`
+                                e.classList.remove("red-color")
+                            }
+                            else if (data == "404") {
+                                toastr.warning("Yorumunuz bulunamadı")
+                            }
+                            else {
+                                toastr.warning("Hata ! " + data)
+                            }
+
+                        })
+                        .catch(error => {
+                            console.error(error);
+                            toastr.error("Beklenmedik bir hata oluştu");
+                            return
+                        });
+
+                } else {
+                    fetch('/Comment/LikeComment', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: commentId
+
+                    })
+                        .then(
+                            response => response.json()
+                        )
+                        .then(data => {
+
+                            if (data == true) {
+                                var commentCount = parseInt(e.parentElement.querySelector("span").textContent)
+                                e.parentElement.querySelector("span").textContent = `${++commentCount}`
+                                e.classList.add("red-color")
+                            }
+                            else if (data == "404") {
+                                toastr.warning("Yorumunuz bulunamadı")
+                            }
+                            else {
+                                toastr.warning("Hata ! " + data)
+                            }
+
+                        })
+                        .catch(error => {
+                            console.error(error);
+                            toastr.error("Beklenmedik bir hata oluştu");
+                            return
+                        });
+
+
+                }
+            })
+        })
+
+
+        const postLike = document.querySelector(".post-footer .icon-heart")
+
+        postLike.addEventListener('click', () => {
+            if (!isAuth()) {
+                toastr.info("Bu işlemi gerçekleştirmek için giriş yapmalısınız")
+                return
+            }
+            const postId = document.querySelector(".post #postId").value
+
+            var likeCount = document.querySelector(".post #postLikeCount")
+
+            if (postId < 1) {
+                toastr.warning("Soru bulunamadı")
+                return
+            }
+            if (!postLike.classList.contains("red-color")) { //it mean this post, not liked before
+                fetch('/Post/LikePost', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: postId
+
+                })
+                    .then(
+                        response => response.json()
+                    )
+                    .then(data => {
+                        if (data == true) {
+                            postLike.parentElement.lastElementChild.innerHTML = `${++likeCount.value}`
+                            if (postLike.classList.contains("animate-heart-remove")) {
+                                postLike.classList.remove("animate-heart-remove")
+                            }
+                            postLike.classList.add("red-color")
+                            postLike.classList.add("animate-heart")
+                        }
+                        else if (data == "404") {
+                            toastr.warning("Sorunuz bulunamadı")
+                        }
+                        else {
+                            toastr.warning(data)
+                        }
+
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        toastr.error("Beklenmedik bir hata oluştu");
+                        return
+                    });
+
+            } else {
+                fetch('/Post/DislikePost', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(postId)
+                })
+                    .then(
+                        response => response.json()
+                    )
+                    .then(data => {
+                        if (data == true) {
+                            postLike.parentElement.lastElementChild.innerHTML = `${--likeCount.value}`
+                            postLike.classList.remove("animate-heart")
+                            postLike.classList.remove("red-color")
+                            postLike.classList.add("animate-heart-remove")
+                        }
+                        else if (data == "404") {
+                            toastr.warning("Sorunuz bulunamadı")
+                        }
+                        else {
+                            toastr.warning(data)
+                        }
+
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        toastr.error("Beklenmedik bir hata oluştu");
+                        return
+
+                    });
+
+
+            }
+
+
+        })
+
+        //toggleComments
+        function toggleComments() {
+            var comments = document.querySelector(".comments-area")
+            if (comments.classList.contains("comments-open")) {
+                comments.classList.remove("comments-open")
+            } else {
+                comments.classList.add("comments-open")
+                window.scrollBy(0, 200);
+            }
+        }
+        //togglereplies
+        //toggleComments
+        function toggleReplies(comment,isReply = false) {
+            var commentRepliesDiv = comment.parentElement.parentElement.querySelector(".replies")
+            if(isReply){
+                commentRepliesDiv.classList.add("replies-open")
+                window.scrollBy(0, 120);
+                return
+            }
+            if (commentRepliesDiv.classList.contains("replies-open")) {
+                commentRepliesDiv.classList.remove("replies-open")
+                window.scrollBy(10,0);
+
+            } else {
+                commentRepliesDiv.classList.add("replies-open")
+                window.scrollBy(0, 120);
+            }
+        }
+        //viewcount
+        window.addEventListener("load", function () {
+            var postId = document.querySelector(".post #postId").value
+            setTimeout(function () {
+                fetch('/Post/InsertViewCount', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(postId)
+                })
+                    .catch(error => {
+                        console.error(error);
+                    });
+            }, 3500)
+        });
+    </script>
+
+}

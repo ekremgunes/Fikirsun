@@ -1,0 +1,209 @@
+﻿@model SettingsUpdateModel
+@{
+    Layout = "_DashboardLayout";
+}
+
+<div class="row">
+    <div class="col-12 mt-4">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="header-title mb-1">Site Ayarları</h4>
+                <br>
+                <form asp-action="Settings" asp-controller="Dashboard" method="post" enctype="multipart/form-data">
+                    <div style="display:none">
+                        <input asp-for="@Model.SiteLogo" value="@Model.SiteLogo" type="hidden" />
+                    </div>
+                    <label class="ml-1" for="logoImg">Logo</label>
+
+                    <div class="input-group mb-5">
+
+                        <label class="img-label" for="logoImg">
+                            <div class="overlay">
+                            </div>
+                        </label>
+
+                        <input id="logoImg" type='file' accept='image/*' name="logoImg"
+                               onchange='openFile(event)'>
+
+                        <div class="output-div" id="output-div">
+                            <div id="output-img-div">
+                                <img class="output-img" src="~/images/@Model.SiteLogo" alt="not found">
+                            </div>
+                            <img class="output" id='output'>
+                        </div>
+                        <span class="text-danger" asp-validation-for="@Model.SiteLogo"></span>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="ml-1" asp-for="@Model.SiteDescription">Açıklama</label>
+                        <input asp-for="@Model.SiteDescription" class="form-control " type="text">
+                        <span class="text-danger" asp-validation-for="@Model.SiteDescription"></span>
+                    </div>
+                    <div class="mb-4 ">
+                        <label class="ml-1" asp-for="@Model.Email">Email</label>
+                        <input asp-for="@Model.Email" class="form-control " type="email">
+                        <span class="text-danger" asp-validation-for="@Model.Email"></span>
+                    </div>
+                    <div class="mb-4 ">
+                        <label class="ml-1" asp-for="@Model.ExtraLink">Ekstra link</label>
+                        <input asp-for="@Model.ExtraLink" class="form-control " type="text">
+                        <span class="text-danger" asp-validation-for="@Model.ExtraLink"></span>
+                    </div>
+
+
+                    <h5 class="h5">Sosyal Medya</h5>
+                    <br>
+                    <div class="mb-4 row">
+                        <div class="col-8">
+                            <label class="ml-1" asp-for="@Model.Instagram">İnstagram</label> <i class=" ti-instagram "></i>
+                            <input asp-for="@Model.Instagram" class="form-control " type="text">
+                            <span class="text-danger" asp-validation-for="@Model.Instagram"></span>
+                        </div>
+                        <div class="col-4">
+                            <label asp-for="@Model.InstagramVisibilty">Görünürlük</label><br>
+                            <label class="switch mt-2">
+                                <input asp-for="@Model.InstagramVisibilty" type="checkbox">
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="text-danger" asp-validation-for="@Model.InstagramVisibilty"></span>
+                        </div>
+
+                    </div>
+                    <div class="mb-4 row">
+                        <div class="col-8">
+                            <label class="ml-1" asp-for="@Model.Twitter">Twitter</label> <i class=" ti-twitter "></i>
+                            <input asp-for="@Model.Twitter" class="form-control " type="text">
+                            <span class="text-danger" asp-validation-for="@Model.Twitter"></span>
+                        </div>
+                        <div class="col-4">
+                            <label asp-for="@Model.TwitterVisibility">Görünürlük</label><br>
+                            <label class="switch mt-2">
+                                <input asp-for="@Model.TwitterVisibility" type="checkbox">
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="text-danger" asp-validation-for="@Model.TwitterVisibility"></span>
+                        </div>
+
+                    </div>
+                    <div class="mb-4 row">
+                        <div class="col-8">
+                            <label class="ml-1" asp-for="@Model.Facebook">Facebook</label> <i class=" ti-facebook "></i>
+                            <input asp-for="@Model.Facebook" class="form-control " type="text">
+                            <span class="text-danger" asp-validation-for="@Model.Facebook"></span>
+                        </div>
+                        <div class="col-4">
+                            <label asp-for="@Model.FacebookVisibility">Görünürlük</label><br>
+                            <label class="switch mt-2">
+                                <input asp-for="@Model.FacebookVisibility" type="checkbox">
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="text-danger" asp-validation-for="@Model.FacebookVisibility"></span>
+                        </div>
+
+                    </div>
+                    <div class="mb-4 row">
+                        <div class="col-8">
+                            <label class="ml-1" asp-for="@Model.Youtube">Youtube</label> <i class=" ti-youtube "></i>
+                            <input asp-for="@Model.Youtube" class="form-control " type="text">
+                            <span class="text-danger" asp-validation-for="@Model.Youtube"></span>
+                        </div>
+                        <div class="col-4">
+                            <label asp-for="@Model.YoutubeVisibility">Görünürlük</label><br>
+                            <label class="switch mt-2">
+                                <input asp-for="@Model.YoutubeVisibility" type="checkbox">
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="text-danger" asp-validation-for="@Model.YoutubeVisibility"></span>
+                        </div>
+
+                    </div>
+                    <div><button type="submit" class="btn btn-primary">Güncelle</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+@section scripts{
+    <script>
+        var openFile = function (event) {
+
+            var input = event.target
+            var path = input.files[0].name
+            var extn = path.substring(path.lastIndexOf('.') + 1).toLowerCase()
+            if (extn == "png" || extn == "jpg" || extn == "jpeg" || extn == "svg") {
+                var reader = new FileReader()
+
+                reader.onload = function () {
+
+                    var dataURL = reader.result
+                    var output = document.getElementById('output')
+                    output.src = dataURL
+                    var outputDiv = document.getElementById("output-div")
+                    var outputImgDiv = document.getElementById("output-img-div")
+
+                    outputImgDiv.style.display = "none"
+                    output.style.display = "inline"
+
+                }
+                reader.readAsDataURL(input.files[0])
+            } else {
+                toastr.info("Desteklenmeyen Dosya Türü")
+            }
+        }
+    </script>
+}
+@section links{
+    <style>
+
+        /*for images*/
+        input[type="file"] {
+            position: absolute;
+            left: -9999rem
+        }
+
+        .overlay {
+            opacity: 0;
+            background: gray;
+            position: absolute;
+            width: 23rem;
+            height: auto !important;
+            border-radius: .7rem;
+        }
+
+        .img-label {
+            border: 2px solid var(--first);
+            display: inline-block;
+            position: absolute;
+            width: 23rem;
+            height: 14rem !important;
+            border-radius: .7rem;
+            cursor: pointer;
+        }
+
+            .img-label:hover #overlay {
+                opacity: 0.8;
+            }
+
+        .output {
+            display: none;
+            z-index: 5;
+            width: 23rem !important;
+            height: auto !important;
+            border-radius: 1rem;
+        }
+
+        .output-img {
+            background-position: center;
+            width: 23rem !important;
+            height: auto !important;
+            border-radius: .7rem;
+        }
+
+        .output-div {
+            margin-bottom: .7rem;
+        }
+    </style>
+}

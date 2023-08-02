@@ -1,0 +1,18 @@
+﻿@model List<Category>
+
+<h5>Kategoriler</h5>
+<ul>
+    <a href="/Home/Index/">
+      <li>Keşfet</li>
+    </a>
+    
+
+    @foreach (var category in Model)
+    {
+
+        <a href="/Home/Index?category=@category.Id" id="category@(category.Id)">
+           <li>@category.Name</li>
+        </a>
+    }
+
+</ul>

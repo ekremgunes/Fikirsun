@@ -1,0 +1,12 @@
+﻿@model int
+
+@if (Model > 0) //eğer bildirim yoksa bu kısmı gösterme
+{
+    <span title="@Model yeni bildirim" id="notificationCountSpan" style="font-size: small;border-radius: 50%;color: whitesmoke;background-color: #ae1a28;
+        position: absolute;height: 1.3rem;width: 1.35rem;margin-left: .22rem;padding-left: .5rem;">
+
+        @(Model < 10 ? Model : "9+") @*Bildirim sayımız*@
+
+    </span>
+}
+

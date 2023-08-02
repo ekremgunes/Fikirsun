@@ -1,0 +1,120 @@
+:root {
+  --dark_primary: rgb(22, 22, 22);
+  --dark_theme: #1d2226;
+}
+
+.light {
+  background-color: #d4d1d0;
+  transition: .3s;
+
+}
+
+.dark {
+  background-color: var(--dark_primary) !important;
+  color: whitesmoke !important;
+  transition: .3s;
+
+}
+
+.item-dark {
+  background-color: var(--dark_theme) !important;
+  color: whitesmoke !important;
+  transition: .3s;
+}
+
+.item-dark-text {
+  color: whitesmoke !important;
+  transition: .3s;
+}
+.hover-dark:hover{
+  color: white !important;
+  text-shadow: 2px 2px 10px rgba(255, 255, 255, 0.4);
+
+}
+
+/* switch started */
+.switch-parent {
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 1.3rem !important;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #edce36b7;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:hover {
+  background-color: #edcf36;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: #edce36b7;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked+.slider {
+  background-color: var(--light_blue);
+}
+
+input:checked+.slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  background-repeat: no-repeat !important;
+  background: url(../images/core/theme.png);
+  background-position: center !important;
+  border-radius: 50%;
+}
+
+/* for theme changing on localStorage */
+.slider-old-style{
+  transition: .3s;
+  background-color: #edce36b7 !important;
+  -webkit-transform: translateX(0px) !important;
+  -ms-transform: translateX(0px) !important;
+  transform: translateX(0px) !important;
+}
+.slider-old-style::before{
+  -webkit-transform: translateX(0px) !important;
+  -ms-transform: translateX(0px) !important;
+  transform: translateX(0px) !important;
+}
+
+/* switch finished */

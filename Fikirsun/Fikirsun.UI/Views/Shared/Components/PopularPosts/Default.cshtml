@@ -1,0 +1,31 @@
+﻿@model List<Post>
+<div id="footer-recommended">
+    <h5>Popüler Sorular</h5>
+    <div>
+        <ul>
+        @if (Model.Count > 0)
+        {
+            foreach (var post in Model)
+            {
+
+                    <li style="margin-left:.5rem" class="py-1">
+                        <a style="word-wrap:break-word;" href="/Post/Index/@post.Id">
+                            <h6>@(post.postTitle.Length <= 25
+                                ? post.postTitle 
+                                : $"{post.postTitle.Substring(0, 25)}..")</h6>
+                        </a>
+                    </li>
+            }
+        }
+        else
+        {
+                <li style="margin-left:.5rem">
+                    <a href="/Home/Index">
+                        <h6>Üyelerimiz dinleniyor . .</h6>
+                    </a>
+                </li>
+        }
+
+        </ul>
+    </div>
+</div>

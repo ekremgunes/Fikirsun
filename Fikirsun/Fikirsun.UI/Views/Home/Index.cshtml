@@ -1,0 +1,224 @@
+﻿@model List<Post>
+@{
+    Layout = "_Layout";
+    bool haveContent = true;
+    if (Model.Count <= 0)
+    {
+        haveContent = false;
+    }
+}
+@section title{
+    Fikirsun
+}
+@section links{
+
+    <style>
+        .activeCategory li {
+            background-color: rgba(196, 196, 196, 0.507) !important;
+            padding: .5rem !important;
+            padding-left: .8rem !important;
+        }
+    </style>
+}
+
+
+<section id="left-forum-section" class=" col-md-12 col-lg-2">
+    <div class="left-div">
+
+        @await Component.InvokeAsync("Categories")
+
+    </div>
+</section>
+
+<section id="middle-forum-section" class="col-lg-7 col-md-12 ">
+    <div id="nav-search">
+        <input id="search-input" type="text" placeholder="ara">
+        <a onclick="searchPost()" href="javascript:void(0)" id="search-icon">
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </a>
+    </div>
+    <div class="post-area" id="postArea">
+        @if (haveContent)
+        {
+            @foreach (var post in Model)
+            {
+                <div class="post row">
+                    <div class="col-12 ">
+                        <div class="post-info">
+                            <a class="userName" href="/Account/UserDetail?userName=@post.user?.UserName">
+
+                                <img src="/images/@post.user?.profilePhoto" class="post-sender-img">
+
+
+                                @post.user?.UserName
+                            </a><small class="post-date">@(TimeHelper.Invoke(post.createdDate))</small>
+                        </div>
+
+                        <div class="post-content">
+                            <a href="/Post/Index/@post.Id">
+                                <h2 class="post-head">@post.postTitle</h2>
+
+                            </a>
+                            <div class="post-footer">
+                                <div>
+                                    @if (post.tags != null)
+                                    {
+                                        @foreach (var tag in post.tags)
+                                        {
+                                            <a href="/Home/Index?tag=@tag.Name" class="tag">#@tag.Name</a>
+
+                                        }
+
+                                    }
+                                    <a href="/Home/Index?category=@post.categoryId" class="tag">@post.category.Name</a>
+                                    <i class="fa-regular fa-comments icon-comment"> </i><span>@post.comments.Count</span>
+
+                                    <i title="beğenmek için postu ziyaret etmelisiniz" class="fa-solid fa-heart icon-heart"> </i><span>@post.likeCount</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="post row">
+                <div class="col-12 p-1">
+                    <h5 class="p-4">
+                        @ViewBag.NoResultMessage
+                    </h5>
+                </div>
+            </div>
+        }
+
+    </div>
+    @if (haveContent)
+    {
+        <div class="text-center" id="postLoadBtnDiv">
+            <button onclick="LoadMore(this)" class="btn-load-more">Daha fazla yükle</button>
+            <i class="fa-solid fa-hourglass fa-bounce fa-2xl"></i>
+        </div>
+    }
+
+</section>
+
+<section id="right-forum-section" class=" col-md-5 col-lg-2">
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        @await Component.InvokeAsync("UserInfo")
+    }
+
+    <div id="footer">
+
+        @await Component.InvokeAsync("PopularPosts")
+
+        @await Component.InvokeAsync("SocialMedias")
+        
+
+
+    </div>
+
+    @await Component.InvokeAsync("Pages")
+
+</section>
+@section scripts{
+    <script>
+        const searchInput = document.querySelector("#nav-search").querySelector("#search-input")
+
+        searchInput.addEventListener("keyup", function (event) {
+            if (event.keyCode === 13) {
+                searchPost();
+            }
+        });
+
+        function searchPost() {
+            var searchValue = searchInput.value.trim();
+            var urlParams = new URLSearchParams(window.location.search)
+            var catId = urlParams.get('category')
+
+            if (searchValue.length < 1) {
+                toastr.warning("Boş bir şeyi aramak mı ? 😁")
+                return
+            }
+            if (catId != "" && catId != null && catId > 0) {
+
+                if (searchValue.includes("#")) {
+                    window.location.href = "/Home/Index?tag=" + searchValue.substring(1) + "&category=" + catId;
+                }
+                else  {
+                    window.location.href = "/Home/Index?search=" + searchValue + "&category=" + catId;
+                }
+
+            }else{
+                if (searchValue.includes("#")) {
+                    window.location.href = "/Home/Index?tag=" + searchValue.substring(1);
+                }
+                else  {
+                    window.location.href = "/Home/Index?search=" + searchValue;
+                }
+            }
+            
+        }
+        window.addEventListener("load", function () {
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const catId = urlParams.get('category');
+
+            if (catId > 0 && catId != null && catId != "") {
+                var activeCategory = document.querySelector(`#category${catId}`)
+                activeCategory.classList.add("activeCategory")
+            }
+        });
+
+        //LOAD MORE
+        var pageIndex = 2;
+
+        function LoadMore(element) {
+            var urlParams = new URLSearchParams(window.location.search)
+            var catId = urlParams.get('category') 
+            var tag = urlParams.get('tag')
+            var search = urlParams.get('search')
+            var hourglassIcon = document.querySelector(".fa-hourglass")
+
+            element.style.display = "none"
+            hourglassIcon.style.display = "inline-block"
+
+            $.ajax({
+                url: "/Home/LoadMore",
+                type: "GET",
+                data: {
+                    pageIndex: pageIndex,
+                    tag: tag,
+                    category: catId,
+                    search: search
+                },
+                success: function (response) {
+
+                    setTimeout(function () {
+                        element.style.display = "inline-block"
+                        hourglassIcon.style.display = "none"
+                        if (response.includes("nopostfounded")) {
+                            if (document.querySelector("#postLoadBtnDiv") != null) {
+                                $("#postArea").append(response);
+                            }
+                            $("#postLoadBtnDiv").remove()
+                            localDarkCheck()
+                            return
+                        }
+                        $("#postArea").append(response);
+                        localDarkCheck()
+                    }, 200)
+                    pageIndex++;
+
+                },
+                error: function (err) {
+                    console.error(err);
+                    element.style.display = "inline-block"
+                    hourglassIcon.style.display = "none"
+                }
+            });
+        }
+    </script>
+}

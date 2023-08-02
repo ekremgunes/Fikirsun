@@ -1,0 +1,97 @@
+﻿@model List<Notification>
+@{
+    Layout = "_Layout";
+}
+
+@section title{
+    Fikirsun | Bildirimlerim
+}
+<section id="middle-forum-section" class="col-lg-9 col-12 ">
+    <div class="post-area ">
+        <div class="post-area">
+            <div class="post mt-4 row">
+                <div class="col-12 p-1">
+                    <h3 class="p-1 text-center">Bildirimlerim</h3>
+                </div>
+            </div>
+            @if (Model.Count > 0)
+            {
+                @foreach (var notification in Model)
+                {
+                    <div class="post col-10 mx-auto row text-center" 
+                        style="@(NotifyCSS.Invoke((NotificationType)notification.NotifyType)) @(notification.isRead ? "opacity:0.75":"")">
+                        <div class="row">
+                            <div class="post-info pb-3 col-11 col-md-3">
+                                <a class="userName" href="javascript:void(0)">
+                                
+                                </a><small class="post-date">@(TimeHelper.Invoke(notification.signDate))</small>
+                                
+                                <i class="fa-solid fa-eye"></i><span>@(notification.isRead ? " görüldü" : "")</span>
+                            </div>
+                            <div class="post-content pt-2 col-11 col-md-9 ">
+                                <a href="@(notification.returnUrl == null
+                                        ? "javascript:void(0)"
+                                        : notification.returnUrl)">
+
+                                    <h6 style="font-weight:normal !important" class="post-head">@notification.Content</h6>
+
+                                </a>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                }
+
+            }
+            else
+            {
+                <div class="post row">
+                    <div class="col-12 p-1">
+                        <h6 class="p-3 text-center">Yeni bir bildiriminiz yok</h6>
+                    </div>
+                </div>
+            }
+        </div>
+        
+
+
+    </div>
+
+</section>
+<section id="right-forum-section" class="col-12 col-lg-3">
+
+    @await Component.InvokeAsync("UserInfo")
+
+
+    <div id="footer">
+        @await Component.InvokeAsync("SocialMedias")
+
+    </div>
+    @await Component.InvokeAsync("Pages")
+</section>
+
+@section scripts{
+    <script>
+        window.addEventListener('load', function (event) {
+            setTimeout(function (){
+                fetch('/Home/SetNotifications', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .catch(function (error) {
+                        console.error('İstek gönderilirken hata oluştu: ' + error);
+                        return
+                    });
+                    setTimeout(function(){
+                      document.getElementById("notificationCountSpan").remove()
+                    },100)
+            },250)
+            
+        });
+
+    </script>
+}

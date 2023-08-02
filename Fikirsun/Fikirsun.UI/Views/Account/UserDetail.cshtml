@@ -1,0 +1,95 @@
+﻿@model UserModel
+@{
+    Layout = "_Layout";
+}
+@section title{
+    Fikirsun | @Model.UserName
+}
+<section id="middle-forum-section" class="col-lg-9 col-12 ">
+    <div class="post-area ">
+        <div class="post-area">
+            @if (Model.posts.Count > 0)
+            {
+                @foreach (var post in Model.posts)
+                {
+                    <div class="post row">
+                        <div class="col-12 ">
+                            <div class="post-info">
+                                <a class="userName" href="/Account/UserDetail?userName=@post.user.UserName">
+
+                                    <img src="/images/@post.user!.profilePhoto" class="post-sender-img">
+
+
+                                    @post.user.UserName
+                                </a><small class="post-date">@(TimeHelper.Invoke(post.createdDate))</small>
+                            </div>
+
+                            <div class="post-content">
+                                <a href="/Post/Index/@post.Id">
+                                    <h2 class="post-head">@post.postTitle</h2>
+
+                                </a>
+                                <div class="post-footer">
+                                    <div>
+                                        @if (post.tags != null)
+                                        {
+                                            @foreach (var tag in post.tags)
+                                            {
+                                                <a href="javascript:void(0);" class="tag">#@tag.Name</a>
+
+                                            }
+
+                                        }
+                                        <a href="/Home/Index/@post.categoryId" class="tag">@post.category.Name</a>
+                                        <i class="fa-regular fa-comments icon-comment"> </i><span>@post.comments.Count</span>
+                                        <i title="beğenmek için postu ziyaret etmelisiniz" class="fa-solid fa-heart icon-heart"> </i><span>@post.likeCount</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                }
+
+            }
+            else
+            {
+                <div class="post row">
+                    <div class="col-12 p-1">
+                        <h6 class="p-4 py-5">Bu kullanıcı daha önce bir soru sormamış.</h6>
+                    </div>
+                </div>
+            }
+        </div>
+       @* <div class="text-center">
+            <button onclick="LoadMore(this)" class="btn-load-more">Daha fazla yükle</button>
+            <i class="fa-solid fa-hourglass fa-bounce fa-2xl"></i>
+        </div>
+*@
+
+    </div>
+
+</section>
+<section id="right-forum-section" class="col-12 col-lg-3">
+
+    <div class="user-info">
+        <a href="/Account/UserDetail?userName=@Model.UserName"><img src="/images/@Model.profilePhoto" alt="Kullanıcı profil resmi"></a>
+        <h4>@Model.UserName</h4>
+        <h6>@Model.userSubName</h6>
+        <h6><span id="follower-count">@Model.posts.Count</span> kez sordu</h6>
+        <p>
+            @Model.about
+        </p>
+        <small>@(TimeHelper.Invoke(Model.signDate)) üye oldu </small>
+    </div>
+
+    <div id="footer">
+        @await Component.InvokeAsync("UserSocialMedias",Model.UserName)
+
+    </div>
+    @await Component.InvokeAsync("Pages")
+
+
+</section>

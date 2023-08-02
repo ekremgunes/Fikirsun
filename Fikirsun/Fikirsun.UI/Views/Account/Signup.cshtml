@@ -1,0 +1,233 @@
+﻿@{
+    Layout = "";
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fikirsun | Kaydol</title>
+    <!-- custom css -->
+
+    <link rel="stylesheet" href="/front/assets/css/style.css">
+    <link rel="stylesheet" href="/front/assets/css/responsive.css">
+    <link rel="stylesheet" href="/front/assets/css/loginSignup.css">
+
+    <!-- libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css"
+          integrity="sha512-SbiR/eusphKoMVVXysTKG/7VseWii+Y3FdHrt0EpKgpToZeemhqHeZeLWLhJutz/2ut2Vw1uQEj2MbRF+TVBUA=="
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.css"
+          integrity="sha512-+ouAqATs1y4kpPMCHfKHVJwf308zo+tC9dlEYK9rKe7kiP35NiP+Oi35rCFnc16zdvk9aBkDUtEO3tIPl0xN5w=="
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dosis&display=swap" rel="stylesheet">
+        <link href="~/lib/toastr/toastr.min.css" rel="stylesheet" />
+    <!-- particle js-->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+</head>
+
+<body>
+    <div class="overlay"></div>
+    <div id="particles-js"></div>
+
+    <main class="centerDiv">
+        <div>
+            <div class="form_login_signup" style="max-width: 90%;margin-left: 5%;">
+                <div class="form-header">
+                    <h3>Kaydol</h3>
+                </div>
+                <div>
+                    <span></span>
+                    <i class="fa-solid fa-user"></i>
+                    <input style="max-width: 100%;" placeholder="Kullanıcı Adınız" id="UserName" title="Kullanıcı Adınızı girin" type="text">
+
+                </div>
+                <div>
+                    <span></span>
+                    <i class="fa-solid fa-envelope"></i>
+                    <input style="max-width: 100%;" placeholder="E-mail adresiniz" id="Email" title="Email adresinizi girin" type="email">
+
+                </div>
+                <div>
+                    <span></span>
+                    <i class="fa-solid fa-key"></i>
+                    <input style="max-width: 100%;" placeholder="Şifre" onchange="comparePasswords()" type="password" id="Password" title="Şifrenizi girin">
+
+                </div>
+                <div>
+                    <span></span>
+                    <i class="fa-solid fa-key"></i>
+                    <input style="max-width: 100%;" placeholder="Şifre yeniden" onkeyup="comparePasswords()" type="password" id="RePassword" title="Şifrenizi yeniden girin">
+
+                </div>
+                    
+
+                
+                <div class="text-center">                   
+                    <p style="font-size:13.5px;opacity:0.85;">
+                        Kaydolarak
+                         <a href="/Home/Page?title=@TempData["Page"]">'@TempData["Page"]'</a> 
+                        Okumuş ve Kabul Etmiş Sayılırsınız
+                    </p>
+
+                    <button id="login_signUp_btn" onclick="SignUp()">Kaydol</button>
+                    <a id="login_signUp_link" asp-controller="Account" asp-action="Login">Zaten Hesabım var</a>
+
+                </div>
+            </div>
+        </div>
+
+    </main>
+    <!-- back to top -->
+    <a onclick="javascript:void(0);" class="back-to-top"><i class="fa-solid fa-arrow-up"></i></a>
+    <!-- loading -->
+    <div class="wrapper">
+        <div class="loader" id="loader">
+            <div class="dot dot1"></div>
+            <div class="dot dot2"></div>
+            <div class="dot dot3"></div>
+        </div>
+    </div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.js" integrity="sha512-6DC1eE3AWg1bgitkoaRM1lhY98PxbMIbhgYCGV107aZlyzzvaWCW1nJW2vDuYQm06hXrW0As6OGKcIaAVWnHJw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    </script>
+    <script src="~/lib/toastr/toastr.min.js"></script>
+    <script src="/front/assets/js/app.js"></script>
+    <script src="/front/assets/js/Account.js"></script>
+    <script>
+        function SignUp() {
+
+            //username
+            if (userName.value.trim() == "") {
+                userName.style.borderColor = "#f22d19ed"
+                userNameStatus = false
+
+            } else {
+                userName.style.borderColor = "#46ca0a"
+                userNameStatus = true
+            }
+            //email
+            if (email.value.trim() == "") {
+                email.style.borderColor = "#f22d19ed"
+                emailStatus = false
+
+            } else if (!email.value.includes("\u0040")) {
+                email.style.borderColor = "#f22d19ed";
+                emailStatus = false;
+            }
+            else {
+                email.style.borderColor = "#46ca0a"
+                emailStatus = true
+
+            }
+            //password
+            if (password.value.trim() == "") {
+                password.style.borderColor = "#f22d19ed"
+                passwordStatus = false
+
+            } else {
+                password.style.borderColor = "#46ca0a"
+                passwordStatus = true
+
+            }
+            if (repassword.value.trim() == "") {
+                repasswordStatus = false
+            } else {
+                repasswordStatus = true
+            }
+
+            if (userNameStatus && emailStatus && passwordStatus && repasswordStatus && comparePasswords()) {
+                const user = {
+                    UserName: userName.value.trim(),
+                    Email: email.value.trim(),
+                    Password: password.value.trim()
+                }
+
+                fetch('/Account/Signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(user)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data == true) {
+                            toastr.info("Hesabın oluşturuldu, giriş yapabilirsin " + user.UserName)
+                            setTimeout(function (){
+                                window.location.href = "/Account/Login"
+                            },1300);
+                        } else {
+                            toastr.warning(data);
+                        }
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        toastr.error("Beklenmedik bir hata oluştu");
+                    });
+            } else {
+                userName.addEventListener("keyup", () => {
+                    if (userName.value.trim() == "") {
+                        userName.style.borderColor = "#f22d19ed"
+                    } else {
+                        userName.style.borderColor = "#46ca0a"
+                    }
+                })
+                password.addEventListener("keyup", () => {
+                    if (password.value.trim() == "") {
+                        password.style.borderColor = "#f22d19ed"
+                    } else {
+                        password.style.borderColor = "#46ca0a"
+                    }
+                })
+
+                email.addEventListener("keyup", () => {
+
+                    if (email.value.trim() == "") {
+                        email.style.borderColor = "#f22d19ed"
+                        loginStatus = false
+
+                    } else if (!email.value.includes("\u0040")) {
+                        email.style.borderColor = "#f22d19ed";
+                        emailStatus = false;
+                    }
+                    else {
+                        email.style.borderColor = "#46ca0a"
+                        loginStatus = true
+                    }
+                })
+            }
+
+        }
+    </script>
+
+    <script>
+        particlesJS("particles-js", {
+            "particles": {
+                "number": {
+                    "value": 100
+                },
+                "size": {
+                    "value": 2.80
+                }
+            },
+            "interactivity": {
+                "events": {
+                    "onhover": {
+                        "enable": true,
+                        "mode": "repulse"
+                    }
+                }
+            }
+        });
+    </script>
+
+</body>
+
+</html>

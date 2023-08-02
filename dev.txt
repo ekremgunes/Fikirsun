@@ -1,0 +1,11 @@
+*kullanıcıt tag paylaşımı yaparken kelime uzunluğu sınırı olmalı tasarımı bozabiliyor
+
+*Optimizasyon için test edilmesi gerekli
+
+* Post paylaşma kısmındaki editörde başlıklar temadan dolayı renksiz gelebilir.
+
+*Kullanıcı bilgilerinde email kontrolü eklenmeli
+
+*Şifremi Unuttum yok
+
+*Popülerlik algoritması test edilmeli büyük rakamlarla

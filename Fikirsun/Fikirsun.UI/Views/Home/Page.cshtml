@@ -1,0 +1,26 @@
+﻿@model Page
+
+@section title{
+    Fikirsun | @Model.Title
+}
+<section id="middle-forum-section" class="row col-12 " style="min-height:90vh !important">
+    <div class="post-area ">
+        <div class="post">
+            <div>
+                <div class="post-info">                  
+
+                </div>
+
+                <div class="post-content p-3 p-lg-5">
+                    <h1 class="post-head text-center">@Model.Title</h1>
+                    <p class="post-inner">
+                        @Html.Raw(Model.Content)
+                    </p>
+                    
+                </div>
+
+            </div>
+        </div>
+    </div>
+    @await Component.InvokeAsync("Pages")
+</section>

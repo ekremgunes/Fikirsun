@@ -1,0 +1,16 @@
+﻿@model List<Page>
+
+<div class="text-center small footer-links mb-3 col-12">
+    @foreach (var item in Model)
+    {
+        <a href="/Home/Page?title=@item.Title">@item.Title </a>
+
+        <span>&#x2022; </span>
+
+    }
+    Copyright 
+    <i>
+        <a style="color:#c79005 !important;margin: .2rem;" href="http://fikirsun.site">Fikirsun</a>
+    </i>
+    <script>var date = new Date(); document.write(date.getFullYear());</script> &copy;
+</div>

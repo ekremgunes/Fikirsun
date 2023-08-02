@@ -1,0 +1,139 @@
+﻿@model List<Post>
+@{
+    Layout = "_DashboardLayout";
+}
+
+<div class="row">
+    <div class="col-12 mt-5">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="header-title">Sorular</h4>
+                <div class="data-tables datatable-primary">
+                    <table id="tabledataPosts" class="text-center">
+                        <thead class="text-capitalize">
+                            <tr>
+                                <th>Başlık</th>
+                                <th>Sahibi</th>
+                                <th>Tarih</th>
+                                <th>Beğeni</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Count > 0)
+                            {
+                                @foreach (var post in Model)
+                                {
+                                    <tr>
+                                        <td>@post.postTitle</td>
+                                        <td>@post.user?.UserName</td>
+
+                                        <td>@post.createdDate</td>
+                                        <td>@post.likeCount</td>
+                                        <td>
+                                            <a class="mx-2" onclick="DeletePost(@post.Id,this)" href="javascript:void(0)">
+                                                <i style="color:red" class="ti-trash"></i>
+                                            </a>
+                                            <a title="Sayfada gör" class="mx-2" target="_blank" href="/Post/Index/@post.Id" href="javascript:void(0)">
+                                                <i class="ti-eye"> Gör </i>
+                                            </a>
+                                        </td>
+
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <span style="display:none" class="infoAlert">Henüz bir soru yok</span>
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section links{
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.18/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.jqueryui.min.css">
+    <style>
+        /*data tables*/
+        .data-tables .dataTable {
+            width: inherit;
+            border-radius: .5rem;
+        }
+
+        table th {
+            padding: .85rem;
+        }
+
+        div.dataTables_wrapper div.dataTables_length select {
+            width: 4rem;
+        }
+
+        table td {
+            padding: .9rem;
+        }
+
+        table tr td [class^="ti-"] {
+            font-size: 1.3rem;
+            margin: .2rem;
+        }
+    </style>
+}
+@section scripts{
+
+    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.3/js/responsive.bootstrap.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.18/js/dataTables.bootstrap4.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#tabledataPosts').DataTable({
+                "order": [[2, "desc"]]
+            });
+        });
+
+
+
+        function DeletePost(id, element) {
+            if (id <= 0) {
+                toastr.warning("Post bulunamadı")
+            }
+            else {
+                var postId = id
+                fetch('/Post/DeletePost', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(postId)
+                })
+                    .then(
+                        response => response.json()
+                    )
+                    .then(data => {
+                        if (data == true) {
+                            setTimeout(function () {
+                                element.parentElement.parentElement.remove()
+                                toastr.info("Başarıyla Silindi")
+                            }, 50)
+                        }else {
+                             toastr.warning(data)
+                        }                   
+
+                    })
+                    .catch (error => {
+                        console.error(error);
+                        toastr.error("Beklenmedik bir hata oluştu");
+                    });
+                }
+           }
+    </script>
+}
+

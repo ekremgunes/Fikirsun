@@ -1,0 +1,45 @@
+﻿@model UpdateUserRoleModel
+@{
+    Layout = "_DashboardLayout";
+}
+<div class="container my-2">
+    <div style="background-color:white;text-align:center;" class="p-3 m-3">
+        <img style="width:10rem;height:10rem !important;border-radius:50%;" src="/images/@ViewBag.user.profilePhoto">
+        <br />
+        <h4>Kullanıcı : @ViewBag.user.UserName</h4>
+        <p><b>Tarihinden beri üye : @ViewBag.user.signDate.ToString("dd/MM/yyyy")</b> </p>
+        <br />
+        <br />
+
+        <h4>Kullanıcı Rolü</h4>
+        <br>
+        <form method="post" asp-action="UpdateUser" asp-controller="Dashboard">
+            <input type="hidden" asp-for="@Model.userId" value="@Model.userId" />
+            <div class="mb-3 d-flex justify-content-center">
+                <select class="form-control" style="display:flex;justify-content:center;width:32%;text-align:center;" asp-for="@Model.roleId">
+
+                    @foreach (var role in ViewBag.Roles)
+                    {
+                        if (role == ViewBag.userRole)
+                        {
+                            <option selected value="@role.Id">
+                                @role.Name
+                            </option>
+                        }
+                        else
+                        {
+                            <option value="@role.Id">
+                                @role.Name
+                            </option>
+                        }
+                    }
+                </select>
+            </div>
+            <div>
+                <button class="btn btn-primary btn-sm" type="submit">Güncelle</button>
+            </div>
+        </form>
+
+    </div>
+
+</div>

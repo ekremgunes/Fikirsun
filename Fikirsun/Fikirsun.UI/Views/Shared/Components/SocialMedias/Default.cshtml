@@ -1,0 +1,31 @@
+﻿@model SocialMediaModels
+
+<div id="footer-social-links">
+    <div>
+        <ul>
+            @if (Model.InstagramVisibilty)
+            {
+                <li><a href="@Model.Instagram"><i style="font-size:18px;" class="fa-brands fa-instagram"></i>Instagram</a></li>
+            }
+            @if (Model.TwitterVisibility)
+            {
+                <li><a href="@Model.Twitter"><i style="font-size:18px;" class="fa-brands fa-twitter"></i>Twitter</a></li>
+            }
+            @if (Model.FacebookVisibility)
+            {
+                <li><a href="@Model.Facebook"><i style="font-size:18px;" class="fa-brands fa-facebook"></i>Facebook</a></li>
+            }
+            @if (Model.YoutubeVisibility)
+            {
+                <li>
+                    <a href="@Model.Youtube">
+                        <i style="font-size:18px;" class="fa-brands fa-youtube"></i>Youtube
+                    </a>
+                </li>
+            }
+            <li><a href="@Model.ExtraLink"><i style="font-size:18px;" class="fa-solid fa-globe"></i>Ekstra</a></li>
+
+        </ul>
+    </div>
+
+</div>

@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>Fikirsun.Tools</AssemblyName>
+    <RootNamespace>Fikirsun.Tools</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Fikirsun.DAL\Fikirsun.DAL.csproj" />
+    <ProjectReference Include="..\Fikirsun.Entities\Fikirsun.Entities.csproj" />
+  </ItemGroup>
+
+</Project>

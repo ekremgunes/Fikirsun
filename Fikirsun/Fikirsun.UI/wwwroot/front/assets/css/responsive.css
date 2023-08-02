@@ -1,0 +1,201 @@
+@media screen and (min-width:1400px) {
+    #footer #footer-recommended ul li h6 {
+        font-size: 13pt;
+    }
+}
+
+@media screen and (min-width:1300px) {
+    #footer #footer-recommended ul li h6 {
+        font-size: 12pt;
+    }
+}
+
+@media screen and (min-width:1200px) {
+    #footer #footer-recommended ul li h6 {
+        font-size: 10pt;
+    }
+}
+
+@media screen and (max-width:1200px) {
+    #right-forum-section {
+        width: 92%;
+        margin-top: .5rem;
+    }
+
+    #footer #footer-recommended ul li h6 {
+        font-size: 11pt;
+    }
+
+    .btn-recomended-follow {
+        margin-left: 2.5rem;
+    }
+
+    #footer {
+        display: flex;
+        align-content: center;
+        justify-content: space-evenly;
+    }
+
+    #footer-recommended h6 {
+        font-size: 12pt;
+        display: inline;
+        margin-left: .6rem;
+    }
+
+    #middle-forum-section {
+        width: 74%;
+        margin-left: 1rem;
+    }
+
+    .post {
+        min-width: 20rem;
+        margin-top: 1rem;
+    }
+
+    #left-forum-section {
+        max-width: 98%;
+        padding-left: 0;
+        margin-left: .7rem;
+    }
+
+
+}
+
+@media screen and (max-width:1024px) {
+
+    html,
+    body {
+        overflow-x: hidden !important;
+
+    }
+
+    #modal-delete p {
+        margin: 0 !important;
+    }
+
+    .modal-delete-footer button {
+        margin: 0;
+        margin-top: .5rem;
+
+    }
+
+    .modal-delete-footer .no-btn {
+        margin-right: .3rem !important;
+    }
+
+    #right-forum-section {
+        width: 100%;
+    }
+
+    #footer #footer-recommended ul li h6 {
+        font-size: 12pt;
+    }
+
+    #middle-forum-section {
+        width: 100%;
+        margin-left: .1rem;
+    }
+
+    .post {
+        min-width: 17rem;
+    }
+
+    .left-div ul li:hover {
+        padding-right: 1rem;
+    }
+
+    #left-forum-section {
+        width: 100%;
+        padding-left: 0;
+        margin-left: 1rem;
+    }
+
+    .left-div {
+        width: 100%;
+        overflow: visible;
+    }
+
+    .left-div ul {
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        width: 98%;
+        overflow-x: scroll;
+    }
+
+}
+
+
+/* medium */
+@media screen and (max-width: 922px) {
+
+    .left-div ul {
+        padding-left: 2rem;
+    }
+
+}
+
+@media screen and (max-width: 750px) {
+
+    #nav-links {
+        display: none;
+    }
+
+    .preview-image {
+        width: 8rem !important;
+        height: 8rem !important;
+    }
+    .left-div ul {
+        padding-left: 4rem;
+    }
+    .image-upload {
+        width: 8rem !important;
+        height: 8rem !important;
+    }
+
+
+}
+
+/* small screen */
+@media screen and (max-width: 540px) {
+    .left-div ul {
+        padding-left: 11rem;
+    }
+
+    #footer {
+        display: block;
+    }
+
+    #footer #footer-recommended ul li h6 {
+        font-size: 10pt;
+    }
+
+    #footer-recommended {
+        padding: 0.4rem 2rem;
+    }
+
+    .post {
+        min-width: 15rem;
+    }
+
+    .replies {
+        width: 90% !important;
+    }
+
+    .post-img-div {
+        justify-content: start;
+    }
+}
+
+@media screen and (max-width: 380px) {
+    .left-div ul {
+        padding-left: 16rem;
+    }
+
+}
+
+@media screen and (max-width: 350px) {
+    .left-div ul {
+        padding-left: 19rem;
+    }
+}
