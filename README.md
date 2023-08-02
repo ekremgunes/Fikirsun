@@ -26,7 +26,7 @@ Here are the key features and highlights of the project(without crud):
 - . . .
 
 
-## ❓ Project View
+## ❓ Project View (pls wait will loaded)
 
 ![](/fikirsunSunum(2).gif)
 
@@ -49,7 +49,7 @@ Provide step-by-step instructions on how to install and use the project. It's he
 Sample installation steps:
 
 1. First, clone and star the project 😂👍
-2. Rebuild-Clean Project, check .net version⚠️
+2. Rebuild Project, check .net version⚠️
 3. Db Connection: 
 `put your connection string to appsettings.json file`
 4. Comment SeedData F.: `If 'seedData.Initialize()' is open,make it comment line because firstly we should update db(program.cs)`
