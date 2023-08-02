@@ -46,7 +46,7 @@ Here are the key features and highlights of the project(without crud):
 
 Provide step-by-step instructions on how to install and use the project. It's helpful to mention the required dependencies and environment variables.
 
-Sample installation steps:
+Installation steps:
 
 1. First, clone and star the project 😂👍
 2. Rebuild Project, check .net version⚠️
