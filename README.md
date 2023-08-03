@@ -8,7 +8,7 @@
 Here are the key features and highlights of the project(without crud):
 
 - Like System
-- Notification System (`when:like,comment claim,comment,reply,rol upgrade`)
+- Notification System (`when:like,comment claim,comment,reply,role upgrade`)
 - Comment & Reply System
 - Popularity Algorithm with many params (`example:2 min later and 3 like , 30 second later and 2 like. Probably second is popular `)
 - Subscription System 
